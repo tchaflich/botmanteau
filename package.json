@@ -1,0 +1,22 @@
+{
+  "name": "botmanteau",
+  "version": "1.0.0",
+  "description": "Portmanteau bot for Discord",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tchaflich/botmanteau.git"
+  },
+  "author": "tchaflich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tchaflich/botmanteau/issues"
+  },
+  "homepage": "https://github.com/tchaflich/botmanteau#readme",
+  "dependencies": {
+    "discord.js": "^11.5.1"
+  }
+}
