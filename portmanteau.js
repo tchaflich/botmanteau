@@ -38,7 +38,7 @@ class portmanteau {
 			return [];
 		}
 
-		return this.message.content.split(/\s+/g);
+		return this.message.content.split(/\W+/g);
 	}
 
 
@@ -49,7 +49,7 @@ class portmanteau {
 	 * @return {boolean}
 	 */
 	isInputWordWorthy(word) {
-		if (!word || word.length < 5) {
+		if (!word || word.length < 3) {
 			return false;
 		}
 
@@ -74,15 +74,27 @@ class portmanteau {
 	 * @param {boolean} result
 	 */
 	isOutputWorthy(result) {
-		if (result[2].length > Math.min(result[0].length, result[1].length)) {
+		// make sure the merged word isn't too short (based on shorter input word)
+		if (result[2].length < Math.min(result[0].length, result[1].length)) {
 			return false;
 		}
 
-		return true; // todo more control on output
+		// if the output has 3+ of the same character in a row, fail
+		let i;
+		if (/(\w)\1{2}/i.test(result[2])) {
+			return false;
+		}
+
+		// if the output is the same as one of the inputs, fail
+		if (result[2].toLowerCase() === result[0].toLowerCase() || result[2].toLowerCase() === result[1].toLowerCase()) {
+			return false;
+		}
+
+		return true;
 	}
 
 
-	splitWord(word, numberOfLetters) {
+	getWordChunks(word, numberOfLetters) {
 		let splits = [];
 		let i;
 		for (i = 0; i < word.length - numberOfLetters + 1; i++) {
@@ -102,16 +114,83 @@ class portmanteau {
 	 * @returns {?string}
 	 */
 	checkWordPair(firstWord, secondWord) {
-		// is there an easy overlap to be found?
-		let firstSplit = this.splitWord(firstWord, 3);
-		let secondSplit = this.splitWord(secondWord, 3);
-
 		let i;
-		for (i = 0; i < firstSplit.length; i++) {
-			let j = secondSplit.indexOf(firstSplit[i]);
+		let ilen;
+
+		// check for matches at the end of FW and the beginning of SW
+		// must have between 2 & minlength-1 characters matching
+
+		ilen = Math.min(firstWord.length, secondWord.length);
+		for (i = 2; i < ilen; i++) {
+			if (firstWord.substr(-1 * i) === secondWord.substr(0, i)) {
+				return firstWord + secondWord.substr(i);
+			}
+		}
+
+		// is there an easy three-character overlap to be found?
+
+		let firstChunks = this.getWordChunks(firstWord, 3);
+		let secondChunks = this.getWordChunks(secondWord, 3);
+
+		ilen = firstChunks.length;
+		for (i = 0; i < ilen; i++) {
+			let j = secondChunks.indexOf(firstChunks[i]);
 			if (j !== -1) {
 				// gottem
 				return firstWord.substr(0, i) + secondWord.substr(j);
+			}
+		}
+
+		let clean = (a) => {
+			return a;
+		};
+
+		// look for vowel matches
+		// prefer double-match
+
+		const vowelifier = /([aeiou]+)/g;
+		let firstSplit = firstWord.toLowerCase().split(vowelifier).filter(clean);
+		let secondSplit = secondWord.toLowerCase().split(vowelifier).filter(clean);
+
+		ilen = firstSplit.length;
+		for (i = 0; i < ilen; i++) {
+			if (!(vowelifier.test(firstSplit[i]))) {
+				continue;
+			}
+			let k = secondSplit.indexOf(firstSplit[i]);
+			if (k === -1) {
+				continue;
+			}
+			if (secondSplit[k + 2] && secondSplit[k + 2] === firstSplit[i + 2]) {
+				return ([]
+					.concat(firstSplit.slice(0, i + 1))
+					.concat(secondSplit.slice(k + 1))
+				).join('');
+			}
+		}
+
+		// look for any vowel match
+		// prefer end of first word, beginning of second
+		let m;
+		let n;
+		let mlen = firstSplit.length;
+		let nlen = secondSplit.length;
+
+		for (m = mlen - 1; m >= 0; m--) {
+			if (!vowelifier.test(firstSplit[m])) {
+				continue;
+			}
+			for (n = 0; n < nlen; n++) {
+				if (!vowelifier.test(secondSplit[n])) {
+					continue;
+				}
+
+				if (firstSplit[m] === secondSplit[n]) {
+					return ([]
+						.concat(firstSplit.slice(0, m))
+						.concat(secondSplit.slice(n))
+					).join('');
+				}
 			}
 		}
 
@@ -146,9 +225,14 @@ class portmanteau {
 				continue; // continue 2
 			}
 
+			// make sure we aren't merging the same thing to itself
+			if (content[i].toLowerCase() === content[i + 1].toLowerCase()) {
+				continue;
+			}
+
 			// find output
 			let result = this.checkWordPair(content[i], content[i + 1]);
-			if (result && this.isOutputWorthy(result)) {
+			if (result && this.isOutputWorthy([content[i], content[i + 1], result])) {
 				return [
 					content[i],
 					content[i + 1],

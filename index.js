@@ -23,8 +23,15 @@ client.on('message', msg => {
 		return;
 	}
 
-	if (msg.content === 'ping') {
-		msg.reply('pong');
+	let standard = {
+		'ping': 'pong',
+		'marco': 'polo',
+		'bad bot': ':sob:',
+		'good bot': ':smiley:',
+	};
+
+	if (msg.content && msg.content.toLowerCase() in standard) {
+		msg.reply(standard[msg.content.toLowerCase()]);
 		return;
 	}
 
