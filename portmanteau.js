@@ -54,7 +54,8 @@ class portmanteau {
 		}
 
 		let bad = [
-			/ing^/i
+			/ing^/i,
+			/ly^/i,
 		];
 
 		let i;
@@ -82,6 +83,15 @@ class portmanteau {
 		// if the output has 3+ of the same character in a row, fail
 		let i;
 		if (/(\w)\1{2}/i.test(result[2])) {
+			return false;
+		}
+
+		// is the output a non-strict substring of one of the inputs?
+
+		if (
+			(result[0].toLowerCase().indexOf(result[2].toLowerCase()) >= 0) ||
+			(result[1].toLowerCase().indexOf(result[2].toLowerCase()) >= 0)
+		) {
 			return false;
 		}
 
