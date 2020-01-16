@@ -1,7 +1,7 @@
+require('dotenv').config();
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const config = require('./config');
 const portmanteau = require('./portmanteau');
 
 client.on('ready', () => {
@@ -41,4 +41,4 @@ client.on('message', msg => {
 	}
 });
 
-client.login(config.APIToken);
+client.login(process.env.APIToken);
