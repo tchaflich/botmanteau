@@ -177,10 +177,16 @@ class portmanteau {
 		let nlen = secondSplit.length;
 
 		for (m = mlen - 1; m >= 0; m--) {
+			if (m < mlen / 2) {
+				continue;
+			}
 			if (!vowelifier.test(firstSplit[m])) {
 				continue;
 			}
 			for (n = 0; n < nlen; n++) {
+				if (n > nlen / 2) {
+					continue;
+				}
 				if (!vowelifier.test(secondSplit[n])) {
 					continue;
 				}
@@ -259,6 +265,7 @@ class portmanteau {
 			'\n> ' +
 			firstWord + ' ' + secondWord +
 			'\n' +
+			(process.env.TEST ? '[test] ' : '') +
 			mergedWord
 		);
 	}
