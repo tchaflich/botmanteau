@@ -49,7 +49,7 @@ class portmanteau {
 	 * @return {boolean}
 	 */
 	isInputWordWorthy(word) {
-		if (!word || word.length < 3) {
+		if (!word || word.length < 4) {
 			return false;
 		}
 
