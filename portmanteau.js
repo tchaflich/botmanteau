@@ -1,11 +1,6 @@
 
 class portmanteau {
 
-	constructor(msg) {
-		this.message = msg;
-	}
-
-
 	/**
 	 * Main; call other functions
 	 * Returns a formatted reply message if found;
@@ -13,8 +8,12 @@ class portmanteau {
 	 *
 	 * @returns {string}
 	 */
-	parse() {
-		let split = this.getSplitContent();
+	parse(messageText) {
+		if (!messageText) {
+			return null;
+		}
+
+		let split = this.splitText(this.cleanText(messageText));
 		if (!split) {
 			return null;
 		}
@@ -27,18 +26,19 @@ class portmanteau {
 		return this.formatReply.apply(this, found);
 	}
 
+	cleanText(messageText) {
+		return messageText; // todo
+	}
+
 
 	/**
 	 * Get the content of the message, split into words
 	 *
 	 * @returns {Array.<string>}
 	 */
-	getSplitContent() {
-		if (!this.message || !this.message.content) {
-			return [];
-		}
-
-		return this.message.content.split(/\W+/g);
+	splitText(messageText) {
+		console.log(messageText);
+		return messageText.split(/\W+/g);
 	}
 
 
@@ -76,11 +76,13 @@ class portmanteau {
 	 */
 	isOutputWorthy(result) {
 		// make sure the merged word isn't too short (based on shorter input word)
+
 		if (result[2].length < Math.min(result[0].length, result[1].length)) {
 			return false;
 		}
 
 		// if the output has 3+ of the same character in a row, fail
+
 		let i;
 		if (/(\w)\1{2}/i.test(result[2])) {
 			return false;
@@ -95,10 +97,7 @@ class portmanteau {
 			return false;
 		}
 
-		// if the output is the same as one of the inputs, fail
-		if (result[2].toLowerCase() === result[0].toLowerCase() || result[2].toLowerCase() === result[1].toLowerCase()) {
-			return false;
-		}
+		// ok we cool
 
 		return true;
 	}
@@ -179,37 +178,6 @@ class portmanteau {
 			}
 		}
 
-		// look for any vowel match
-		// prefer end of first word, beginning of second
-		let m;
-		let n;
-		let mlen = firstSplit.length;
-		let nlen = secondSplit.length;
-
-		for (m = mlen - 1; m >= 0; m--) {
-			if (m < mlen / 2) {
-				continue;
-			}
-			if (!vowelifier.test(firstSplit[m])) {
-				continue;
-			}
-			for (n = 0; n < nlen; n++) {
-				if (n > nlen / 2) {
-					continue;
-				}
-				if (!vowelifier.test(secondSplit[n])) {
-					continue;
-				}
-
-				if (firstSplit[m] === secondSplit[n]) {
-					return ([]
-						.concat(firstSplit.slice(0, m))
-						.concat(secondSplit.slice(n))
-					).join('');
-				}
-			}
-		}
-
 		return null;
 	}
 
@@ -275,7 +243,6 @@ class portmanteau {
 			'\n> ' +
 			firstWord + ' ' + secondWord +
 			'\n' +
-			(process.env.TEST ? '[test] ' : '') +
 			mergedWord
 		);
 	}
