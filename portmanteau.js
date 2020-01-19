@@ -14,6 +14,7 @@ class portmanteau {
 		}
 
 		let split = this.splitText(this.cleanText(messageText));
+		console.log(split);
 		if (!split) {
 			return null;
 		}
@@ -26,8 +27,22 @@ class portmanteau {
 		return this.formatReply.apply(this, found);
 	}
 
+
+	/**
+	 * Strip out anything that is "clutter" and not textual content
+	 * For example, remove URLs
+	 *
+	 * @param {string} messageText
+	 */
 	cleanText(messageText) {
-		return messageText; // todo
+		return (messageText
+			// URL data
+			.replace(portmanteau.urlRegex, '')
+			// probably a busted link, better to strip out out
+			.replace(/\w+\.\w+(\.\w+)*/gi, '')
+			// discord user mention references
+			.replace(/<@![0-9]+>/g, '')
+		);
 	}
 
 
@@ -37,7 +52,9 @@ class portmanteau {
 	 * @returns {Array.<string>}
 	 */
 	splitText(messageText) {
-		return messageText.split(/\W+/g);
+		return messageText.split(/\W+/g).filter((a) => {
+			return a;
+		});
 	}
 
 
@@ -248,6 +265,11 @@ class portmanteau {
 	}
 
 }
+
+// https://stackoverflow.com/a/8943487
+// this is for stripping input, so false positives aren't a big deal
+portmanteau.urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+
 
 module.exports = portmanteau;
 
