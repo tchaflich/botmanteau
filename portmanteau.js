@@ -37,7 +37,6 @@ class portmanteau {
 	 * @returns {Array.<string>}
 	 */
 	splitText(messageText) {
-		console.log(messageText);
 		return messageText.split(/\W+/g);
 	}
 

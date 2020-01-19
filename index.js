@@ -82,7 +82,7 @@ function doesCooldownApply(messages, cooldownMinutes) {
  * @param {object} message
  */
 function isAddressedToBot(message) {
-	return !!(message && message.mentions && message.mentions.find((u) => {
+	return !!(message && message.mentions && message.mentions.users && message.mentions.users.find((u) => {
 		return u.id === client.user.id;
 	}));
 }
