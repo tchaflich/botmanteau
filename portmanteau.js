@@ -55,6 +55,7 @@ class portmanteau {
 		let bad = [
 			/ing$/i,
 			/ly$/i,
+			/[0-9]/,
 		];
 
 		let i;
