@@ -14,7 +14,6 @@ class portmanteau {
 		}
 
 		let split = this.splitText(this.cleanText(messageText));
-		console.log(split);
 		if (!split) {
 			return null;
 		}
@@ -65,19 +64,20 @@ class portmanteau {
 	 * @return {boolean}
 	 */
 	isInputWordWorthy(word) {
-		if (!word || word.length < 4) {
+		if (!word || word.length < 5) {
 			return false;
 		}
 
-		let bad = [
+		let forbidden = [
 			/ing$/i,
 			/ly$/i,
 			/[0-9]/,
+			/^wh/i,
 		];
 
 		let i;
-		for (i = 0; i < bad.length; i++) {
-			if (bad[i].test(word)) {
+		for (i = 0; i < forbidden.length; i++) {
+			if (forbidden[i].test(word)) {
 				return false;
 			}
 		}
